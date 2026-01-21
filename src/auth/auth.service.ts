@@ -5,18 +5,19 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService, private jwtService: JwtService) {}
+    constructor(private usersService: UsersService, private jwtService: JwtService) { }
 
     // Sign in
-    async signIn(SignInDto:SignInDto): Promise<any> {
+    async signIn(SignInDto: SignInDto): Promise<any> {
         const user = await this.usersService.findByUsername(SignInDto.username);
-
-        if(user?.password !== SignInDto.password) {
-            throw new UnauthorizedException()
+        
+        if(user?.password !== SignInDto.password){
+            throw new UnauthorizedException('Invalid credentials');
         }
-
-        const payload = { username: user.username, sub: user.id };
-        return {access_token: this.jwtService.sign(payload)};
+        const payload = { username: user.username, sub: user.userId };
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
     }
 
 }

@@ -13,14 +13,17 @@ export enum UserRole{
 
 @Schema({timestamps:true})
 export class User {
+    readonly userId?: string;
+
     @Prop({required:true})
     username:string;
 
     @Prop({required:true,unique:true,lowercase:true,trim:true})
     email:string;
 
-    @Prop({required:true,select:false})
+    @Prop({required:true})
     password:string;
+
 
     @Prop({enum:UserRole,default:UserRole.USER})
     role:UserRole;
@@ -66,3 +69,12 @@ export class User {
 
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_, ret) => {
+    const { _id, password, __v, ...rest } = ret;
+    return rest;
+  },
+});
