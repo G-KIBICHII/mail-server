@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
@@ -19,10 +19,20 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  async findOne(id: string) {
-    const user = await this.userModel.findById(id).exec();
+  async findOne(idorUsername: string) {
+    let user;
+    // Try to find by ID first
+    if(Types.ObjectId.isValid(idorUsername)){
+      user = await this.userModel.findById(idorUsername).exec();
+    }
+
+    // If not found by ID, try to find by username
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      user = await this.userModel.findOne({ username: idorUsername }).exec();
+    }
+
+    if (!user) {
+      throw new NotFoundException(`User with identifier ${idorUsername} not found`);
     }
     return user;
   }
@@ -38,5 +48,10 @@ export class UsersService {
     }
 
     return result;
+  }
+
+
+   async findByUsername(username: string): Promise<User | null> {
+    return this.userModel.findOne({ username }).exec();
   }
 }

@@ -9,7 +9,7 @@ export class AuthService {
 
     // Sign in
     async signIn(SignInDto:SignInDto): Promise<any> {
-        const user = await this.usersService.findOne(SignInDto.username);
+        const user = await this.usersService.findByUsername(SignInDto.username);
 
         if(user?.password !== SignInDto.password) {
             throw new UnauthorizedException()
@@ -17,9 +17,6 @@ export class AuthService {
 
         const payload = { username: user.username, sub: user.id };
         return {access_token: this.jwtService.sign(payload)};
-
-        // const { password, ...result } = user;
-        // return result;
     }
 
 }
