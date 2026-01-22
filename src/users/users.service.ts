@@ -43,6 +43,9 @@ export class UsersService {
   async findByUsername(username: string): Promise<User | null> {
     return await this.userModel.findOne({ username }).select('+password').exec();
   }
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.userModel.findOne({ email }).select('+password').exec();
+  }
 
 
 }
