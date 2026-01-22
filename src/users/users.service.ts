@@ -46,6 +46,9 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return await this.userModel.findOne({ email }).select('+password').exec();
   }
+  async findByPhoneNumber(phoneNumber: any): Promise<User | null> {
+    return await this.userModel.findOne({ phoneNumber }).select('+password').exec();
+  }
 
 
 }

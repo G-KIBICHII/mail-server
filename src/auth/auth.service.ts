@@ -3,6 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/sign-up.dto';
+import  * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -11,8 +12,11 @@ export class AuthService {
     // Sign in
     async signIn(SignInDto: SignInDto): Promise<any> {
         const user = await this.usersService.findByUsername(SignInDto.username);
-
-        if (user?.password !== SignInDto.password) {
+        if (!user) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+        const isPasswordValid = await bcrypt.compare(SignInDto.password, user.password);
+        if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid credentials');
         }
         const payload = { username: user.username, sub: user.userId };
@@ -24,7 +28,6 @@ export class AuthService {
     // signup 
     async signUp(signUpDto: SignupDto): Promise<any> {
         {
-            // Implementation for signing up a user
             // check if username exists
             const existingUserByUsername = await this.usersService.findByUsername(signUpDto.username);
             if (existingUserByUsername) {
@@ -36,7 +39,16 @@ export class AuthService {
                 throw new UnauthorizedException('Email already in use');
             }
 
+            // check if phone number exists
+            const existingUserByPhone = await this.usersService.findByPhoneNumber(signUpDto.phoneNumber);
+            if (existingUserByPhone) {
+                throw new UnauthorizedException('Phone number already in use');
+            }
+
             // hash password
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(signUpDto.password, saltRounds);
+            signUpDto.password = hashedPassword;
             // save user
             const newUser = this.usersService.create({
                 username: signUpDto.username,
@@ -45,13 +57,12 @@ export class AuthService {
                 phoneNumber: signUpDto.phoneNumber,
                 email: signUpDto.email,
                 password: signUpDto.password,
-                // other fields...
             });
             const payload = { username: newUser.username, sub: newUser.userId };
             return {
                 access_token: this.jwtService.sign(payload),
             };
-            // return JWT token
+            
         }
     }
 

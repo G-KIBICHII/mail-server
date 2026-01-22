@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
@@ -30,6 +31,12 @@ export function MatchPassword(property: string) {
   };
 }
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest',
+}
+
 export class SignupDto {
   // 👤 Identity
   @IsString()
@@ -50,7 +57,7 @@ export class SignupDto {
   @IsNotEmpty()
   lastName: string;
 
-  // 🔐 Security
+  // Security
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   password: string;
@@ -59,8 +66,13 @@ export class SignupDto {
   @MatchPassword('password')
   confirmPassword: string;
 
-  // 📱 Contact
+  // Contact
   @IsOptional()
   @IsPhoneNumber()
   phoneNumber?: string;
+
+  // Role
+  @IsEnum(UserRole)
+  @IsOptional()
+  role: UserRole = UserRole.USER; // ✅ default
 }

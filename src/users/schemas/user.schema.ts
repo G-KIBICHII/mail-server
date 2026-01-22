@@ -40,7 +40,7 @@ export class User {
     @Prop({default:false})
     isWhatsAppNumber:boolean;
 
-    @Prop({default:true})
+    @Prop({default:false})
     isEmailVerified:boolean;
 
     @Prop({default:false})
