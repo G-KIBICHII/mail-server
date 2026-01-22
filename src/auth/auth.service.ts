@@ -4,10 +4,15 @@ import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/sign-up.dto';
 import  * as bcrypt from 'bcrypt';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService, private jwtService: JwtService) { }
+    constructor(
+        private usersService: UsersService,
+        private readonly emailService :EmailService,
+         private jwtService: JwtService
+        ) {}
 
     // Sign in
     async signIn(SignInDto: SignInDto): Promise<any> {
@@ -50,6 +55,8 @@ export class AuthService {
             const hashedPassword = await bcrypt.hash(signUpDto.password, saltRounds);
             signUpDto.password = hashedPassword;
             // save user
+            await this.sendWelcomeEmail(signUpDto.email, signUpDto.firstName);
+            
             const newUser = this.usersService.create({
                 username: signUpDto.username,
                 firstName: signUpDto.firstName,
@@ -66,4 +73,13 @@ export class AuthService {
         }
     }
 
+    // send welcome email
+    async sendWelcomeEmail(email: string, firstName: string) {
+        await this.emailService.sendMail(
+            email,
+            'Welcome to Our Platform',
+            `Hello ${firstName}, welcome to our platform!`,
+            `<p>Hello ${firstName}, welcome to our platform!</p>`
+        );
+    }
 }
