@@ -8,7 +8,7 @@ export class EmailService {
         this.transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'kibichiigilbert024@gmail.com', 
+                user: 'kibichiigilbert024@gmail.com',
                 pass: 'ovxeigzkairzlhas',
             },
         });
@@ -17,7 +17,7 @@ export class EmailService {
 
     async sendMail(to: string, subject: string, text: string, html?: string) {
         const mailOptions = {
-            from: '"Mail Server" kibichiigilbert024@gmail.com',
+            from: '"Mail Server" kibichii Advocate ltm',
             to,
             subject,
             text,
@@ -34,10 +34,24 @@ export class EmailService {
         }
 
     }
+
+    async sendBulkMail(recipients: string[], subject: string, text: string, html?: string) {
+        const mailOptions = {
+            from: '"Mail Server" kibichii Advocate ltm',
+            bcc: recipients.join(', '),
+            subject,
+            text,
+            html,
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log(`Bulk email sent to ${recipients.length} recipients: ${info.messageId}`);
+            return info;
+        } catch (error) {
+
+        }
+    }
+
+
 }
-
-
-
-// https://myaccount.google.com/u/1/apppasswords?continue=https://myaccount.google.com/people-and-sharing&rapt=AEjHL4MCvOuNxJ852JDlStAcHCUqn-H9isWVSMViys6CPy-TrSpbPlIPk6nhNyaorrsV-MkQqphUehQbblKHEmt02BfOOiUL6c_A_OPYWpIrN_r2RSV8iKc
-
-// ovxe igzk airz lhas

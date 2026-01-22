@@ -56,7 +56,6 @@ export class AuthService {
             signUpDto.password = hashedPassword;
             // save user
             await this.sendWelcomeEmail(signUpDto.email, signUpDto.firstName);
-            
             const newUser = this.usersService.create({
                 username: signUpDto.username,
                 firstName: signUpDto.firstName,
